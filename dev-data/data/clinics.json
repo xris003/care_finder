@@ -1,0 +1,42 @@
+[
+    {
+      "_id": "5c8a1d5b0190b214360dc057",
+      "email": "stluke@example.io",
+      "healthName": "St Luke's Hospital",
+      "healthType": "hospital",
+      "active": true,
+      "password": "$2a$12$Q0grHjH9PXc6SxivC8m12.2mZJ9BbKcgFpwSG4Y1ZEII8HJVzWeyS"
+    },
+    {
+      "_id": "5c8a1d5b0190b218160dc057",
+      "email": "fmch@example.io",
+      "healthName": "FMC Hospital",
+      "healthType": "hospital",
+      "active": true,
+      "password": "$2a$12$hP1h2pnNp7wgyZNRwPsOTeZuNzWBv7vHmsR3DT/OaPSUBQT.y0S.."
+    },
+    {
+        "_id": "5c8a9d5b0190n214360dc057",
+        "email": "lite@example.com",
+        "healthName": "Light Pharmacy",
+        "healthType": "pharmacy",
+        "active": true,
+        "password": "$2a$12$hP1h2pnNp7wgyZNRwPsOTeZuNzWBv7vHmsR3DT/OaPSUBQT.y0S.."
+    },
+    {
+        "_id": "5c8a1d5b0190b219140dc057",
+        "email": "fmch@gmail.io",
+        "healthName": "Faith Clinic",
+        "healthType": "clinic",
+        "active": true,
+        "password": "$2a$12$hP1h2pnNp7wgyZNRwPsOTeZuNzWBv7vHmsR3DT/OaPSUBQT.y0S.."
+      },
+      {
+        "_id": "5c8a1d5b0190b214360dc057",
+        "email": "glenn@example.io",
+        "healthName": "Glenn maternity",
+        "healthType": "maternity",
+        "active": true,
+        "password": "$2a$12$hP1h2pnNp7wgyZNRwPsOTeZuNzWBv7vHmsR3DT/OaPSUBQT.y0S.."
+      }
+]
