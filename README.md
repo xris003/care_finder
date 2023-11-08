@@ -1,2 +1,3 @@
 # care_finder
-A health care system REST API for Clinics, Maternity, Pharmacy 
+
+A healthcare system REST API that returns data about the locaton, name and country of Clinics, Maternity, Pharmacy. In the context of this project a mongodb is used for storing and querying data.
