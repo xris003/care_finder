@@ -3,6 +3,11 @@ const healthcareController = require("./../controllers/healthcareController");
 
 const router = express.Router();
 
+router.param("id", (req, res, next, val) => {
+  console.log(`HC id is: ${val}`);
+  next();
+});
+
 router
   .route("/")
   .get(healthcareController.getAllHealthCares)
