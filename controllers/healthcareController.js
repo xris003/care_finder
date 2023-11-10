@@ -1,42 +1,59 @@
 const fs = require("fs");
 const Health = require("./../models/healthcareModel");
 
-const healthcare = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/clinics.json`)
-);
+// const healthcare = JSON.parse(
+//   fs.readFileSync(`${__dirname}/../dev-data/data/clinics.json`)
+// );
 
-exports.getAllHealthCares = (req, res) => {
-  console.log(req.requestTime);
+exports.getAllHealthCares = async (req, res) => {
+  const health = await Health.find();
 
   res.status(200).json({
     status: "success",
-    requestedAt: req.requestTime,
-    results: healthcare.length,
+    results: health.length,
     data: {
-      healthcare,
+      health,
     },
   });
 };
 
-exports.getHealthCare = (req, res) => {
+exports.getHealthCare = async (req, res) => {
+  const health = await Health.findById(req.params.id);
+
   res.status(200).json({
     status: "success",
-    results: healthcare.length,
+    results: health.length,
     data: {
-      healthcare,
+      health,
     },
   });
 };
 
-exports.createHealthCare = (req, res) => {
-  console.log(req.body);
-  res.send("Done");
+exports.createHealthCare = async (req, res) => {
+  try {
+    const newHealth = await Health.create(req.body);
+
+    res.status(201).json({
+      status: "success",
+      health: newHealth,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err,
+    });
+  }
 };
 
-exports.updateHealthCare = (req, res) => {
+exports.updateHealthCare = async (req, res) => {
+  const newHealth = await Health.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
   res.status(200).json({
     data: {
-      healthcare,
+      newHealth,
     },
   });
 };

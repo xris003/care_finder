@@ -8,11 +8,11 @@ const healthSchema = new mongoose.Schema({
   },
   healthType: {
     type: String,
-    required: [true, "There must be a type"],
+    // required: [true, "There must be a type"],
   },
   services: {
     type: String,
-    default: ["medical assistance"],
+    default: "Treatment",
   },
   about: {
     type: String,
@@ -20,23 +20,23 @@ const healthSchema = new mongoose.Schema({
   },
   reg: {
     type: String,
-    required: [true, "Only registered healthcares are allowed to register"],
+    // required: [true, "Only registered healthcares are allowed to register"],
   },
   country: {
     type: String,
-    required: [true, "Add the country of the healthcare"],
+    // required: [true, "Add the country of the healthcare"],
   },
   city: {
     type: String,
-    required: [true, "Add the City/Town of the healthcare"],
+    // required: [true, "Add the City/Town of the healthcare"],
   },
   zip: {
     type: Number,
-    required: [true, "A healthcare must have posta code"],
+    // required: [true, "A healthcare must have posta code"],
   },
   address: {
     type: String,
-    required: [true, "A healthcare should have an address"],
+    // required: [true, "A healthcare should have an address"],
   },
   documents: String,
 });
