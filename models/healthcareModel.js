@@ -5,18 +5,21 @@ const healthSchema = new mongoose.Schema({
     type: String,
     required: [true, "A healthcare must have a type"],
     unique: true,
+    trim: true,
   },
   healthType: {
     type: String,
-    // required: [true, "There must be a type"],
+    required: [true, "There must be a type"],
   },
   services: {
     type: String,
     default: "Treatment",
+    trim: true,
   },
-  about: {
+  aboutHealthcare: {
     type: String,
     max: 260,
+    trim: true,
   },
   reg: {
     type: String,
@@ -38,7 +41,19 @@ const healthSchema = new mongoose.Schema({
     type: String,
     // required: [true, "A healthcare should have an address"],
   },
-  documents: String,
+  documents: [String],
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  ratingsAverage: {
+    type: Number,
+    default: 3,
+  },
+  ratingsQuantity: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Health = mongoose.model("Health", healthSchema);

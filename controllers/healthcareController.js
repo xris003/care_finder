@@ -58,12 +58,11 @@ exports.updateHealthCare = async (req, res) => {
   });
 };
 
-exports.deleteHealthCare = (req, res) => {
+exports.deleteHealthCare = async (req, res) => {
+  await Health.findByIdAndDelete(req.params.id);
   console.log(req.body);
-  res.status(200).json({
+  res.status(204).json({
     status: "success",
-    data: {
-      healthcare: "<deleted healthcare here...>",
-    },
+    data: null,
   });
 };
