@@ -12,17 +12,12 @@ const DB = process.env.DATABASE.replace(
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
-    useUnifiedTopology: true, 
+    useUnifiedTopology: true,
   })
   .then((con) => {
     console.log(con.connection);
     console.log("DB connection successful☑️");
   });
-
-  const healthSchema = new mongoose.Schema({
-    name: 
-  })
-
 
 const port = process.env.PORT || 3002;
 app.listen(port, () => {

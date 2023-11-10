@@ -1,4 +1,5 @@
 const fs = require("fs");
+const Health = require("./../models/healthcareModel");
 
 const healthcare = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/clinics.json`)
