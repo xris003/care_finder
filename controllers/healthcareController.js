@@ -21,7 +21,11 @@ exports.getAllHealthCares = async (req, res) => {
 
   // 3) SORTING
   if (req.query.sort) {
-    query = query.sort(req.query.sort);
+    const sortBy = req.query.sort.split(",").join(" ");
+    console.log(sortBy);
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort("-createdAt");
   }
 
   // EXECUTE QUERY
