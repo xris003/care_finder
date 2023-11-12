@@ -6,7 +6,21 @@ const Health = require("./../models/healthcareModel");
 // );
 
 exports.getAllHealthCares = async (req, res) => {
-  const health = await Health.find();
+  //BUILD QUERY
+  // 1) Filtering
+  const queryObj = { ...req.query };
+  const excludedFields = ["page", "sort", "limit", "fields"];
+  excludedFields.forEach((el) => delete queryObj[el]);
+
+  // 2) Advanced Filtering
+  let queryStr = JSON.stringify(queryObj);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  console.log(JSON.parse(queryStr));
+
+  const query = Health.find(JSON.parse(queryStr));
+
+  // EXECUTE QUERY
+  const health = await query;
 
   res.status(200).json({
     status: "success",
