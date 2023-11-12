@@ -17,7 +17,12 @@ exports.getAllHealthCares = async (req, res) => {
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   console.log(JSON.parse(queryStr));
 
-  const query = Health.find(JSON.parse(queryStr));
+  let query = Health.find(JSON.parse(queryStr));
+
+  // 3) SORTING
+  if (req.query.sort) {
+    query = query.sort(req.query.sort);
+  }
 
   // EXECUTE QUERY
   const health = await query;
