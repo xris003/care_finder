@@ -56,6 +56,11 @@ const healthSchema = new mongoose.Schema({
   },
 });
 
+// DOCUMENT MIDDLEWARE
+healthSchema.pre("save", function () {
+  console.log(this);
+});
+
 const Health = mongoose.model("Health", healthSchema);
 
 module.exports = Health;

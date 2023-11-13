@@ -1,54 +1,32 @@
 const fs = require("fs");
 const Health = require("./../models/healthcareModel");
-
+const APIFeatures = require("./../utils/apiFeatures");
 // const healthcare = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/clinics.json`)
 // );
-
 exports.getAllHealthCares = async (req, res) => {
-  //BUILD QUERY
-  // 1) Filtering
-  const queryObj = { ...req.query };
-  const excludedFields = ["page", "sort", "limit", "fields"];
-  excludedFields.forEach((el) => delete queryObj[el]);
+  try {
+    // EXECUTE QUERY
+    const features = new APIFeatures(Health.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const health = await features.query;
 
-  // 2) Advanced Filtering
-  let queryStr = JSON.stringify(queryObj);
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-  console.log(JSON.parse(queryStr));
-
-  let query = Health.find(JSON.parse(queryStr));
-
-  // 3) SORTING
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(",").join(" ");
-    console.log(sortBy);
-    query = query.sort(sortBy);
-  } else {
-    query = query.sort("-createdAt");
+    res.status(200).json({
+      status: "success",
+      results: health.length,
+      data: {
+        health,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err,
+    });
   }
-
-  // 4) FIELD LIMITING
-  if (req.query.fields) {
-    const fields = req.query.fields.split(",").join(" ");
-    query = query.select(fields);
-  } else {
-    query = query.select("-__v");
-  }
-
-  // 5) PAGINATION
-  query = query.skip().limit();
-
-  // EXECUTE QUERY
-  const health = await query;
-
-  res.status(200).json({
-    status: "success",
-    results: health.length,
-    data: {
-      health,
-    },
-  });
 };
 
 exports.getHealthCare = async (req, res) => {
