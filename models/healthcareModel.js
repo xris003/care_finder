@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { default: next } = require("next");
+const slugify = require("slugify");
 
 const healthSchema = new mongoose.Schema({
   name: {
@@ -7,9 +9,15 @@ const healthSchema = new mongoose.Schema({
     unique: true,
     trim: true,
   },
+  slug: String,
   healthType: {
     type: String,
     required: [true, "There must be a type"],
+    enum: {
+      values: ["Hospital", "Clinic", "Maternity", "Pharmacy"],
+      message:
+        "Healthcare type is either: hospital, clinic, maternity, pharmacy",
+    },
   },
   services: {
     type: String,
@@ -18,7 +26,14 @@ const healthSchema = new mongoose.Schema({
   },
   aboutHealthcare: {
     type: String,
-    max: 260,
+    minlength: [
+      100,
+      "A heathcare about section must have at least one hundred characters",
+    ],
+    maxlength: [
+      260,
+      "A healthcare about section cannot have above 260 characters",
+    ],
     trim: true,
   },
   reg: {
@@ -57,9 +72,15 @@ const healthSchema = new mongoose.Schema({
 });
 
 // DOCUMENT MIDDLEWARE
-healthSchema.pre("save", function () {
-  console.log(this);
+healthSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
 });
+
+// healthSchema.post("save", function (doc, next) {
+//   console.log(doc);
+//   next();
+// });
 
 const Health = mongoose.model("Health", healthSchema);
 
