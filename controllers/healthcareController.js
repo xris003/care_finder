@@ -2,6 +2,7 @@ const fs = require("fs");
 const Health = require("./../models/healthcareModel");
 const APIFeatures = require("./../utils/apiFeatures");
 const catchAsync = require("./../utils/catchAsync");
+const AppError = require("../utils/appError");
 // const healthcare = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/clinics.json`)
 // );
@@ -26,6 +27,10 @@ exports.getAllHealthCares = catchAsync(async (req, res, next) => {
 exports.getHealthCare = catchAsync(async (req, res, next) => {
   const health = await Health.findById(req.params.id);
 
+  if (!health) {
+    return next(new AppError("No healthcare with that ID", 404));
+  }
+
   res.status(200).json({
     status: "success",
     results: health.length,
@@ -45,21 +50,28 @@ exports.createHealthCare = catchAsync(async (req, res, next) => {
 });
 
 exports.updateHealthCare = catchAsync(async (req, res, next) => {
-  const newHealth = await Health.findByIdAndUpdate(req.params.id, req.body, {
+  const health = await Health.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
 
+  if (!health) {
+    return next(new AppError("No healthcare with that ID", 404));
+  }
+
   res.status(200).json({
     data: {
-      newHealth,
+      health,
     },
   });
 });
 
 exports.deleteHealthCare = catchAsync(async (req, res, next) => {
-  await Health.findByIdAndDelete(req.params.id);
-  console.log(req.body);
+  const health = await Health.findByIdAndDelete(req.params.id);
+
+  if (!health) {
+    return next(new AppError("No healthcare with that ID", 404));
+  }
   res.status(204).json({
     status: "success",
     data: null,
