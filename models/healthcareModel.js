@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { default: next } = require("next");
 const slugify = require("slugify");
 
 const healthSchema = new mongoose.Schema({
@@ -76,11 +75,6 @@ healthSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
-
-// healthSchema.post("save", function (doc, next) {
-//   console.log(doc);
-//   next();
-// });
 
 const Health = mongoose.model("Health", healthSchema);
 
