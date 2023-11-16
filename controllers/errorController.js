@@ -1,14 +1,27 @@
-const AppError = require("../utils/appError");
+const AppError = require("./../utils/appError");
 
 const handleCastErrorDB = (err) => {
-  const message = `Invalid ${err.path}: ${err.value}`;
+  const message = `Invalid value for ${err.path}: ${err.value}`;
   return new AppError(message, 400);
 };
 
+// const handleDuplicateFieldsDB = (err) => {
+//   const value = err.errmsg.match(/(["'])(\\?.)*?\1/);
+//   console.log(value);
+//   const message = `Duplicate Field Value: ${value} Please use another value`;
+//   return new AppError(message, 400);
+// };
+
 const handleDuplicateFieldsDB = (err) => {
-  const value = err.errmsg.match(/(["'])(\\?.)*?\1/);
-  consoel.log(value);
-  const message = `Duplicate Field Value: x. Please use another value`;
+  const name = err.keyValue.name;
+  const message = `Duplicate Field Value: ${name} Please use another value`;
+  return new AppError(message, 400);
+};
+
+const handleValidationErrorDB = (err) => {
+  const errors = Object.values(err.errors).map((el) => el.message);
+  const message = `Invalid input data. ${errors.join(". ")}`;
+  return new AppError(message, 400);
 };
 
 const sendErrorDev = (err, res) => {
@@ -42,15 +55,19 @@ const sendErrorProd = (err, res) => {
 };
 
 module.exports = (err, req, res, next) => {
+  console.log(err.stack);
+
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
   if (process.env.NODE_ENV === "development") {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
-    let error = { ...err };
-    if (error.name === "CastError") error = handleCastErrorDB(error);
-    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-    sendErrorProd(error, res);
+    //let error = { ...err }; --> This destructure
+    if (err.name === "CastError") err = handleCastErrorDB(err);
+    if (err.code === 11000) err = handleDuplicateFieldsDB(err);
+    if (err.name === "ValidationError") err = handleValidationErrorDB(err);
+
+    sendErrorProd(err, res);
   }
 };
