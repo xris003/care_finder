@@ -23,11 +23,14 @@ exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   // 1) If email and password exists
-  if (!email || !password) {
+  if (!healthEmail || !password) {
     next(new AppError("Please provide email and password", 400));
   }
 
   // 2) if admin and password is correct
+  const admin = Admin.findOne({ healthEmail }).select("+password");
+
+  console.log(admin);
 
   // 3) if ok send token to client
   const token = "";

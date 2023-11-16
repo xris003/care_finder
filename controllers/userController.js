@@ -1,9 +1,13 @@
-exports.getAllUsers = (req, res) => {
+const Admin = require("./../models/adminModel");
+const catchAsync = require("./../utils/catchAsync");
+
+exports.getAllUsers = catchAsync(async (req, res) => {
+  const admins = await Admin.find();
   res.status(500).json({
     status: "error",
     message: "This route is not defined",
   });
-};
+});
 
 exports.getUser = (req, res) => {
   res.status(500).json({
