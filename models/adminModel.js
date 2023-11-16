@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const adminSchema = new mongoose.Schema({
   healthEmail: {
@@ -29,9 +30,12 @@ const adminSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, "Confirm your password"],
-    // validate: {
-    //   validator: true
-    // }
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: "Passwords are not the same",
+    },
   },
 });
 
