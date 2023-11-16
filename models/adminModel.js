@@ -49,6 +49,13 @@ adminSchema.pre("save", async function (next) {
   this.passwordConfirm = undefined;
 });
 
+adminSchema.methods.correctPassword = function (
+  candidatePassword,
+  adminPassword
+) {
+  return bcrypt.compare(candidatePassword, adminPassword);
+};
+
 const Admin = mongoose.model("Admin", adminSchema);
 
 module.exports = Admin;
