@@ -4,7 +4,7 @@ const Admin = require("./../models/adminModel");
 const AppError = require("../utils/appError");
 
 const signToken = (id) => {
-  jwt.sign({ id: newAdmin._id }, process.env.JWT_SECRET, {
+  jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
@@ -12,9 +12,7 @@ const signToken = (id) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const newAdmin = await Admin.create(req.body);
 
-  const token = jwt.sign({ id: newAdmin._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
+  const token = signToken(newAdmin._id);
 
   res.status(201).json({
     status: "success",
@@ -26,7 +24,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 exports.login = (req, res, next) => {
-  const { email, password } = req.body;
+  const { healthEmail, password } = req.body;
 
   // 1) If email and password exists
   if (!healthEmail || !password) {
@@ -42,7 +40,7 @@ exports.login = (req, res, next) => {
   }
 
   // 3) if ok send token to client
-  const token = "";
+  const token = signToken(admin._id);
   res.status(200).json({
     status: "success",
     token,
