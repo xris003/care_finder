@@ -1,14 +1,19 @@
 const mongoose = require("mongoose");
-const slugify = require("slugify");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
-const healthSchema = new mongoose.Schema({
-  name: {
+const healthcareSchema = new mongoose.Schema({
+  healthEmail: {
     type: String,
-    required: [true, "A healthcare must have a type"],
+    required: [true, "A health care must have an email"],
     unique: true,
-    trim: true,
+    validate: [validator.isEmail, "Please enter an email"],
   },
-  slug: String,
+  healthName: {
+    type: String,
+    required: [true, "A healthcare should have a name"],
+    unique: true,
+  },
   healthType: {
     type: String,
     required: [true, "There must be a type"],
@@ -18,64 +23,39 @@ const healthSchema = new mongoose.Schema({
         "Healthcare type is either: hospital, clinic, maternity, pharmacy",
     },
   },
-  services: {
+  password: {
     type: String,
-    default: "Treatment",
-    trim: true,
+    required: [true, "Enter a password"],
+    minlength: 8,
+    select: false,
   },
-  aboutHealthcare: {
+  passwordConfirm: {
     type: String,
-    minlength: [
-      100,
-      "A heathcare about section must have at least one hundred characters",
-    ],
-    maxlength: [
-      260,
-      "A healthcare about section cannot have above 260 characters",
-    ],
-    trim: true,
-  },
-  reg: {
-    type: String,
-    // required: [true, "Only registered healthcares are allowed to register"],
-  },
-  country: {
-    type: String,
-    // required: [true, "Add the country of the healthcare"],
-  },
-  city: {
-    type: String,
-    // required: [true, "Add the City/Town of the healthcare"],
-  },
-  zip: {
-    type: Number,
-    // required: [true, "A healthcare must have posta code"],
-  },
-  address: {
-    type: String,
-    // required: [true, "A healthcare should have an address"],
-  },
-  documents: [String],
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-  },
-  ratingsAverage: {
-    type: Number,
-    default: 3,
-  },
-  ratingsQuantity: {
-    type: Number,
-    default: 0,
+    required: [true, "Confirm your password"],
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: "Passwords are not the same",
+    },
   },
 });
 
-// DOCUMENT MIDDLEWARE
-healthSchema.pre("save", function (next) {
-  this.slug = slugify(this.name, { lower: true });
-  next();
+healthcareSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  this.passwordConfirm = undefined;
 });
 
-const Health = mongoose.model("Health", healthSchema);
+healthcareSchema.methods.correctPassword = async function (
+  candidatePassword,
+  HealthcarePassword
+) {
+  return await bcrypt.compare(candidatePassword, HealthcarePassword);
+};
 
-module.exports = Health;
+const Healthcare = mongoose.model("Healthcare", healthcareSchema);
+
+module.exports = Healthcare;

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const catchAsync = require("../utils/catchAsync");
-const Admin = require("./../models/adminModel");
+const Healthcare = require("../models/healthcareModel");
 const AppError = require("../utils/appError");
 
 const signToken = (id) => {
@@ -10,15 +10,15 @@ const signToken = (id) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const newAdmin = await Admin.create(req.body);
+  const newHealthcare = await Healthcare.create(req.body);
 
-  const token = signToken(newAdmin._id);
+  const token = signToken(newHealthcare._id);
 
   res.status(201).json({
     status: "success",
     token,
     data: {
-      admin: newAdmin,
+      newHealthcare,
     },
   });
 });
@@ -31,16 +31,21 @@ exports.login = catchAsync(async (req, res, next) => {
     next(new AppError("Please provide email and password", 400));
   }
 
-  // 2) if admin and password is correct
-  const admin = await Admin.findOne({ healthEmail }).select("+password");
-  //   const correct = user.correctPassword(password, admin.password);
+  // 2) if Healthcare and password is correct
+  const healthcare = await Healthcare.findOne({ healthEmail }).select(
+    "+password"
+  );
+  //   const correct = user.correctPassword(password, Healthcare.password);
 
-  if (!admin || !(await admin.correctPassword(password, admin.password))) {
+  if (
+    !healthcare ||
+    !(await healthcare.correctPassword(password, healthcare.password))
+  ) {
     return next(new AppError("Incorrect email or password"));
   }
 
   // 3) if ok send token to client
-  const token = signToken(admin._id);
+  const token = signToken(Healthcare._id);
   res.status(200).json({
     status: "success",
     token,

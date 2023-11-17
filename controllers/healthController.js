@@ -1,7 +1,7 @@
 const fs = require("fs");
-const Health = require("./../models/healthcareModel");
-const APIFeatures = require("./../utils/apiFeatures");
-const catchAsync = require("./../utils/catchAsync");
+const Health = require("../models/healthModel");
+const APIFeatures = require("../utils/apiFeatures");
+const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 // const healthcare = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/clinics.json`)
