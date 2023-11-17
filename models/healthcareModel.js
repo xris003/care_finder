@@ -39,6 +39,7 @@ const healthcareSchema = new mongoose.Schema({
       message: "Passwords are not the same",
     },
   },
+  passwordChangedAt: Date,
 });
 
 healthcareSchema.pre("save", async function (next) {
@@ -54,6 +55,20 @@ healthcareSchema.methods.correctPassword = async function (
   HealthcarePassword
 ) {
   return await bcrypt.compare(candidatePassword, HealthcarePassword);
+};
+
+healthcareSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    console.log(this.passwordChangedAt, JWTTimestamp);
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  return false;
 };
 
 const Healthcare = mongoose.model("Healthcare", healthcareSchema);

@@ -14,7 +14,7 @@ router.post("/login", authController.login);
 
 router
   .route("/")
-  .get(healthcareController.getAllHealthCares)
+  .get(authController.protect, healthcareController.getAllHealthCares)
   .post(healthcareController.createHealthCare);
 
 router

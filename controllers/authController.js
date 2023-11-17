@@ -1,3 +1,4 @@
+const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const catchAsync = require("../utils/catchAsync");
 const Healthcare = require("../models/healthcareModel");
@@ -50,4 +51,43 @@ exports.login = catchAsync(async (req, res, next) => {
     status: "success",
     token,
   });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) Get the token and check if it's there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! Login to have access", 401)
+    );
+  }
+  // 2) Verification token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
+
+  // 3) Check if healthcare stil exists
+  const freshHealthcare = await Healthcare.findById(decoded.id);
+  if (!freshHealthcare) {
+    return next(new AppError("The healthcare no longer exists", 401));
+  }
+
+  // 4) Check if healthcare changed password after the token was isssued
+  if (freshHealthcare.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError(
+        "Healthcare recently changed password! Please log in again.",
+        401
+      )
+    );
+  }
+
+  // Grants Access to proctected route
+  next();
 });
