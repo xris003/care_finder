@@ -4,7 +4,7 @@ const Admin = require("./../models/adminModel");
 const AppError = require("../utils/appError");
 
 const signToken = (id) => {
-  jwt.sign({ id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
@@ -23,7 +23,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.login = (req, res, next) => {
+exports.login = catchAsync(async (req, res, next) => {
   const { healthEmail, password } = req.body;
 
   // 1) If email and password exists
@@ -32,10 +32,10 @@ exports.login = (req, res, next) => {
   }
 
   // 2) if admin and password is correct
-  const admin = Admin.findOne({ healthEmail }).select("+password");
+  const admin = await Admin.findOne({ healthEmail }).select("+password");
   //   const correct = user.correctPassword(password, admin.password);
 
-  if (!admin || !admin.correctPassword(password, admin.password)) {
+  if (!admin || !(await admin.correctPassword(password, admin.password))) {
     return next(new AppError("Incorrect email or password"));
   }
 
@@ -45,4 +45,4 @@ exports.login = (req, res, next) => {
     status: "success",
     token,
   });
-};
+});
