@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const AppError = require("./utils/appError");
 const globaErrorHandler = require("./controllers/errorController");
-const healthcareRouter = require("./routes/healthcareRoutes");
+const healthcareRouter = require("./routes/healthRoutes");
 const userRouter = require("./routes/userRoutes");
 
 const app = express();

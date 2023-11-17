@@ -1,5 +1,6 @@
 const express = require("express");
 const healthcareController = require("../controllers/healthController");
+const authController = require("../controllers/authController");
 
 const router = express.Router();
 
@@ -7,6 +8,9 @@ router.param("id", (req, res, next, val) => {
   console.log(`HC id is: ${val}`);
   next();
 });
+
+router.post("/signup", authController.signup);
+router.post("/login", authController.login);
 
 router
   .route("/")
