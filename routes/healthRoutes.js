@@ -15,7 +15,7 @@ router.post("/forgotPassword", authController.forgotPassword);
 
 router
   .route("/")
-  .get(authController.protect, healthcareController.getAllHealthCares)
+  .get(healthcareController.getAllHealthCares)
   .post(healthcareController.createHealthCare);
 
 router

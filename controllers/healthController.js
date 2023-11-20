@@ -1,4 +1,4 @@
-const fs = require("fs");
+const axios = require("axios");
 const Health = require("../models/healthModel");
 const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
@@ -8,20 +8,32 @@ const AppError = require("../utils/appError");
 // );
 exports.getAllHealthCares = catchAsync(async (req, res, next) => {
   // EXECUTE QUERY
-  const features = new APIFeatures(Health.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const health = await features.query;
+  //   const features = new APIFeatures(Health.find(), req.query)
+  //     .filter()
+  //     .sort()
+  //     .limitFields()
+  //     .paginate();
+  //   const health = await features.query;
 
-  res.status(200).json({
-    status: "success",
-    results: health.length,
-    data: {
-      health,
-    },
-  });
+  //   res.status(200).json({
+  //     status: "success",
+  //     results: health.length,
+  //     data: {
+  //       health,
+  //     },
+  //   });
+  // }
+  const apiUrl =
+    "https://www.communitybenefitinsight.org/api/get_hospitals.php";
+  const response = await axios.get(apiUrl);
+
+  // Assuming the data you want to send is in response.data
+  const hospitalsData = response.data;
+
+  // Process the data if needed
+
+  // Send the data as the response
+  res.status(200).json(hospitalsData);
 });
 
 exports.getHealthCare = catchAsync(async (req, res, next) => {
