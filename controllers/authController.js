@@ -46,7 +46,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) if ok send token to client
-  const token = signToken(Healthcare._id);
+  const token = signToken(healthcare._id);
   res.status(200).json({
     status: "success",
     token,
