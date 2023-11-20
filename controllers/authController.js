@@ -1,8 +1,10 @@
+const crypto = require("crypto");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const catchAsync = require("../utils/catchAsync");
 const Healthcare = require("../models/healthcareModel");
 const AppError = require("../utils/appError");
+const sendEmail = require("./../utils/email");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -91,4 +93,101 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // Grants Access to proctected route
   next();
+});
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Get healtcare on POSTed email
+  const healthcare = await Healthcare.findOne({
+    healthEmail: req.body.healthEmail,
+  });
+  if (!healthcare) {
+    return next(
+      new AppError("There is no healthhcare with that email address", 404)
+    );
+  }
+
+  // 2) Generate random reset token
+  const resetToken = healthcare.createPasswordResetToken();
+  await healthcare.save({ validateBeforeSave: false });
+
+  // 3) Send to Healthcare's email
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/users/resetPassword/${resetToken}`;
+
+  const message = `Forgot your password? Submit a PATCH request with your new passsword and passwordConfirm to: ${resetURL}.\n If you didn't forget your password, please ignore this email!`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Your password reset token (valid for 10mins)",
+      message,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Token sent to email!",
+    });
+  } catch (err) {
+    healthcare.passwordResetToken = undefined;
+    healthcare.passwordResetExpires = undefined;
+    await healthcare.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError("There was an error sending the email. Try again"),
+      500
+    );
+  }
+
+  exports.resetPassword = catchAsync(async (req, res, next) => {
+    // 1) Get user based on the token
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const healthcare = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    // 2) If token has not expired, and there is user, set the new password
+    if (!healthcare) {
+      return next(new AppError("Token is invalid or has expired", 400));
+    }
+    healthcare.password = req.body.password;
+    healthcare.passwordConfirm = req.body.passwordConfirm;
+    healthcare.passwordResetToken = undefined;
+    healthcare.passwordResetExpires = undefined;
+    await healthcare.save();
+
+    // 3) Update changedPasswordAt property for the user
+
+    // 4) Log the user in, send JWT
+    createSendToken(user, 200, res);
+  });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get User from collection
+  const healthcare = await Healthcare.findById(req.healthcare.id).select(
+    "+password"
+  );
+  // 2) Check if POSTed current password is correct
+  if (
+    !(await healthcare.correctPassword(
+      req.body.passwordCurrent,
+      healthcare.password
+    ))
+  ) {
+    return next(new AppError("Your current password is wrong", 401));
+  }
+
+  // 3) If so update password
+  healthcare.password = req.body.password;
+  healthcare.passwordConfirm = req.body.passwordConfirm;
+  await healthcare.save();
+
+  // 4) Log User in, send JWT
+  createSendToken(healthcare, 200, res);
 });
