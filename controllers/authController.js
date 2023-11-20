@@ -46,7 +46,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) if ok send token to client
-  const token = signToken(Healthcare._id);
+  const token = signToken(healthcare._id);
   res.status(200).json({
     status: "success",
     token,
@@ -69,6 +69,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   // 2) Verification token
+  console.log("Received token:", token);
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   console.log(decoded);
 

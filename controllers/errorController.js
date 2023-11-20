@@ -74,7 +74,7 @@ module.exports = (err, req, res, next) => {
     if (err.code === 11000) err = handleDuplicateFieldsDB(err);
     if (err.name === "ValidationError") err = handleValidationErrorDB(err);
     if (err.name === "JsonWebTokenError") err = handleJWTError(err);
-    if (err.name === "TokenExpiredError") error = handleJWTExpiredError(error);
+    if (err.name === "TokenExpiredError") err = handleJWTExpiredError(error);
 
     sendErrorProd(err, res);
   }
