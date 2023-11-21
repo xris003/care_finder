@@ -164,7 +164,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     // 3) Update changedPasswordAt property for the user
 
     // 4) Log the user in, send JWT
-    createSendToken(user, 200, res);
+    createSendToken(healthcare, 200, res);
   });
 });
 
