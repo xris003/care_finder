@@ -102,7 +102,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   });
   if (!healthcare) {
     return next(
-      new AppError("There is no healthhcare with that email address", 404)
+      new AppError("There is no healthcare with that email address", 404)
     );
   }
 
