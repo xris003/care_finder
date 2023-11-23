@@ -113,13 +113,13 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 3) Send to Healthcare's email
   const resetURL = `${req.protocol}://${req.get(
     "host"
-  )}/api/users/resetPassword/${resetToken}`;
+  )}/api/v1/healthcares/resetPassword/${resetToken}`;
 
   const message = `Forgot your password? Submit a PATCH request with your new passsword and passwordConfirm to: ${resetURL}.\n If you didn't forget your password, please ignore this email!`;
 
   try {
     await sendEmail({
-      email: user.email,
+      email: healthcare.healthEmail,
       subject: "Your password reset token (valid for 10mins)",
       message,
     });
@@ -138,34 +138,34 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       500
     );
   }
+});
 
-  exports.resetPassword = catchAsync(async (req, res, next) => {
-    // 1) Get user based on the token
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(req.params.token)
-      .digest("hex");
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user based on the token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
 
-    const healthcare = await User.findOne({
-      passwordResetToken: hashedToken,
-      passwordResetExpires: { $gt: Date.now() },
-    });
-
-    // 2) If token has not expired, and there is user, set the new password
-    if (!healthcare) {
-      return next(new AppError("Token is invalid or has expired", 400));
-    }
-    healthcare.password = req.body.password;
-    healthcare.passwordConfirm = req.body.passwordConfirm;
-    healthcare.passwordResetToken = undefined;
-    healthcare.passwordResetExpires = undefined;
-    await healthcare.save();
-
-    // 3) Update changedPasswordAt property for the user
-
-    // 4) Log the user in, send JWT
-    createSendToken(healthcare, 200, res);
+  const healthcare = await Healthcare.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
   });
+
+  // 2) If token has not expired, and there is user, set the new password
+  if (!healthcare) {
+    return next(new AppError("Token is invalid or has expired", 400));
+  }
+  healthcare.password = req.body.password;
+  healthcare.passwordConfirm = req.body.passwordConfirm;
+  healthcare.passwordResetToken = undefined;
+  healthcare.passwordResetExpires = undefined;
+  await healthcare.save();
+
+  // 3) Update changedPasswordAt property for the user
+
+  // 4) Log the user in, send JWT
+  createSendToken(healthcare, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
