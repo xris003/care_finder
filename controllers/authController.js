@@ -141,7 +141,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  // 1) Get user based on the token
+  // 1) Get healthcare based on the token
   const hashedToken = crypto
     .createHash("sha256")
     .update(req.params.token)
@@ -152,7 +152,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     passwordResetExpires: { $gt: Date.now() },
   });
 
-  // 2) If token has not expired, and there is user, set the new password
+  // 2) If token has not expired, and there is healthcare, set the new password
   if (!healthcare) {
     return next(new AppError("Token is invalid or has expired", 400));
   }
@@ -164,8 +164,12 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 3) Update changedPasswordAt property for the user
 
-  // 4) Log the user in, send JWT
-  createSendToken(healthcare, 200, res);
+  // 4) Log the healthcare in, send JWT
+  const token = signToken(healthcare._id);
+  res.status(200).json({
+    status: "success",
+    token,
+  });
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
