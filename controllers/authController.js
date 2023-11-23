@@ -120,7 +120,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   try {
     await sendEmail({
       email: healthcare.healthEmail,
-      subject: "Your password reset token (valid for 10mins)",
+      subject: "Your password reset token (valid for 20mins)",
       message,
     });
 

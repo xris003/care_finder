@@ -53,6 +53,13 @@ healthcareSchema.pre("save", async function (next) {
   this.passwordConfirm = undefined;
 });
 
+healthcareSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 healthcareSchema.methods.correctPassword = async function (
   candidatePassword,
   HealthcarePassword
