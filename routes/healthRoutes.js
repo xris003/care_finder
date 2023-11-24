@@ -1,5 +1,5 @@
 const express = require("express");
-const healthcareController = require("../controllers/healthController");
+const healthController = require("../controllers/healthController");
 const authController = require("../controllers/authController");
 
 const router = express.Router();
@@ -21,13 +21,13 @@ router.patch(
 
 router
   .route("/")
-  .get(healthcareController.getAllHealthCares)
-  .post(healthcareController.createHealthCare);
+  .get(healthController.getAllHealthCares)
+  .post(healthController.createHealthCare);
 
 router
   .route("/:id")
-  .get(healthcareController.getHealthCare)
-  .patch(healthcareController.updateHealthCare)
-  .delete(healthcareController.deleteHealthCare);
+  .get(healthController.getHealthCare)
+  .patch(healthController.updateHealthCare)
+  .delete(healthController.deleteHealthCare);
 
 module.exports = router;

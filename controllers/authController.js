@@ -12,18 +12,22 @@ const signToken = (id) => {
   });
 };
 
-exports.signup = catchAsync(async (req, res, next) => {
-  const newHealthcare = await Healthcare.create(req.body);
+const createSendToken = (healthcare, statusCode, res) => {
+  const token = signToken(healthcare._id);
 
-  const token = signToken(newHealthcare._id);
-
-  res.status(201).json({
+  res.status(statusCode).json({
     status: "success",
     token,
     data: {
-      newHealthcare,
+      healthcare,
     },
   });
+};
+
+exports.signup = catchAsync(async (req, res, next) => {
+  const newHealthcare = await Healthcare.create(req.body);
+
+  createSendToken(newHealthcare, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -48,11 +52,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) if ok send token to client
-  const token = signToken(healthcare._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createSendToken(healthcare, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -165,15 +165,11 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update changedPasswordAt property for the user
 
   // 4) Log the healthcare in, send JWT
-  const token = signToken(healthcare._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createSendToken(healthcare, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  // 1) Get User from collection
+  // 1) Get Healthcare from collection
   const healthcare = await Healthcare.findById(req.healthcare.id).select(
     "+password"
   );
