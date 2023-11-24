@@ -71,7 +71,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   // 2) Verification token
-  console.log("Received token:", token);
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   console.log(decoded);
 
@@ -90,7 +89,6 @@ exports.protect = catchAsync(async (req, res, next) => {
       )
     );
   }
-
   // Grants Access to proctected route
   next();
 });
@@ -173,6 +171,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   const healthcare = await Healthcare.findById(req.healthcare.id).select(
     "+password"
   );
+  console.log(healthcare);
   // 2) Check if POSTed current password is correct
   if (
     !(await healthcare.correctPassword(
