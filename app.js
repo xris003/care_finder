@@ -4,6 +4,7 @@ const AppError = require("./utils/appError");
 const globaErrorHandler = require("./controllers/errorController");
 const healthcareRouter = require("./routes/healthRoutes");
 const userRouter = require("./routes/userRoutes");
+const adminsRouter = require("./routes/adminsRoutes");
 
 const app = express();
 

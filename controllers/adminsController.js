@@ -1,4 +1,4 @@
-const Admins = require("../models/adminModel");
+const Admins = require("../models/adminsModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 

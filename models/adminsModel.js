@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const adminSchema = new mongoose.Schema({
   photo: [String],
@@ -11,7 +12,7 @@ const adminSchema = new mongoose.Schema({
     required: [true, "An admin needs a last name"],
   },
   phoneNo: {
-    type: Number,
+    type: String,
     required: [true, "A contact number is needed"],
   },
   email: {
