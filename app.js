@@ -35,6 +35,7 @@ app.use((req, res, next) => {
 
 app.use("/api/v1/healthcares", healthcareRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/admins", adminsRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
