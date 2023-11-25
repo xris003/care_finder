@@ -166,7 +166,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(healthcare, 200, res);
 });
 
-// error is coming from the wrong spelling of cast error in the postman endpoint
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get Healthcare from collection
   const healthcare = await Healthcare.findById(req.healthcare.id).select(
