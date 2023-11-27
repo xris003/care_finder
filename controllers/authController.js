@@ -72,16 +72,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   // 2) Verification token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  console.log(decoded);
+  // console.log(decoded);
 
   // 3) Check if healthcare stil exists
-  const freshHealthcare = await Healthcare.findById(decoded.id);
-  if (!freshHealthcare) {
+  const currentHealthcare = await Healthcare.findById(decoded.id);
+  if (!currentHealthcare) {
     return next(new AppError("The healthcare no longer exists", 401));
   }
 
   // 4) Check if healthcare changed password after the token was isssued
-  if (freshHealthcare.changedPasswordAfter(decoded.iat)) {
+  if (currentHealthcare.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError(
         "Healthcare recently changed password! Please log in again.",
@@ -89,6 +89,10 @@ exports.protect = catchAsync(async (req, res, next) => {
       )
     );
   }
+
+  // Set currentUser in both req.user and res.locals.user
+  req.healthcare = currentHealthcare;
+
   // Grants Access to proctected route
   next();
 });
@@ -167,11 +171,10 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  // 1) Get Healthcare from collection
+  // 1) Get Healthcare from Collection
   const healthcare = await Healthcare.findById(req.healthcare.id).select(
     "+password"
   );
-  console.log(healthcare);
   // 2) Check if POSTed current password is correct
   if (
     !(await healthcare.correctPassword(
