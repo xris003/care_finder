@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+
 const AppError = require("./utils/appError");
 const globaErrorHandler = require("./controllers/errorController");
 const healthcareRouter = require("./routes/healthRoutes");
@@ -14,6 +16,14 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "Too many requests from this IP, try again later",
+});
+
+app.use("/api", limiter);
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -25,12 +35,6 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-
-// app.get("/api/v1/healthcares", getAllHealthCares);
-// app.get("/api/v1/healthcares/:id", getHealthCare);
-// app.post("/api/v1/healthcares", createHealthCare);
-// app.patch("/api/v1/healthcares/:id", updateHealthCare);
-// app.delete("/api/v1/healthcares/:id", deleteHealthCare);
 
 // 3) ROUTES
 
