@@ -4,6 +4,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
+const hpp = require("hpp");
 
 const AppError = require("./utils/appError");
 const globaErrorHandler = require("./controllers/errorController");
@@ -39,6 +40,9 @@ app.use(mongoSanitize());
 
 // Data Sanitization against XSS
 app.use(xss());
+
+// Prevent parameter pollution
+app.use(hpp());
 
 app.use((req, res, next) => {
   console.log("Hello Devs 😊");
