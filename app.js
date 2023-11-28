@@ -38,6 +38,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use(mongoSanitize());
 
 // Data Sanitization against XSS
+app.use(xss());
 
 app.use((req, res, next) => {
   console.log("Hello Devs 😊");
