@@ -22,7 +22,7 @@ router.patch(
 
 router
   .route("/")
-  .get(healthController.getAllHealthCares)
+  .get(authController.protect, healthController.getAllHealthCares)
   .post(healthController.createHealthCare);
 
 router
