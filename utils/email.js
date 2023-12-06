@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const { convert } = require("html-to-text");
 
 const sendEmail = async (options) => {
   // 1) Create a transporter
