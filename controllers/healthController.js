@@ -64,14 +64,17 @@ exports.getHealthCare = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createHealthCare = catchAsync(async (req, res, next) => {
-  const newHealth = await Health.create(req.body);
+// Updating create function to be able to accept files
+(exports.createHealthCare = upload.single(file)),
+  catchAsync(async (req, res, next) => {
+    const newHealth = await Health.create(req.body);
+    const documents = req.file.documents;
 
-  res.status(201).json({
-    status: "success",
-    health: newHealth,
+    res.status(201).json({
+      status: "success",
+      health: newHealth,
+    });
   });
-});
 
 exports.updateHealthCare = catchAsync(async (req, res, next) => {
   const health = await Health.findByIdAndUpdate(req.params.id, req.body, {
