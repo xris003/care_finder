@@ -3,9 +3,21 @@ const Health = require("../models/healthModel");
 const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-// const healthcare = JSON.parse(
-//   fs.readFileSync(`${__dirname}/../dev-data/data/clinics.json`)
-// );
+
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, ".files");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now();
+    cb(null, uniqueSuffix + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
 exports.getAllHealthCares = catchAsync(async (req, res, next) => {
   // EXECUTE QUERY
   //   const features = new APIFeatures(Health.find(), req.query)
