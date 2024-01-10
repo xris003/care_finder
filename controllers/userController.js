@@ -1,5 +1,7 @@
 const Healthcare = require("../models/healthcareModel");
 const catchAsync = require("./../utils/catchAsync");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const Healthcares = await Healthcare.find();
@@ -9,12 +11,20 @@ exports.getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not defined",
+exports.getUser = catchAsync(async (req, res, next) => {
+  const user = await Model.findById(req.params.id);
+
+  if (!user) {
+    return next(new AppError("No document with that number", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      data: user,
+    },
   });
-};
+});
 
 exports.createUser = (req, res) => {
   res.status(500).json({
