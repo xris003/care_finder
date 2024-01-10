@@ -22,6 +22,22 @@ const usersSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, "Please enter a valid email"],
   },
+  password: {
+    type: String,
+    required: [true, "Enter a password"],
+    minlength: 8,
+    select: false,
+  },
+  passwordConfirm: {
+    type: String,
+    required: [true, "Confirm your password"],
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: "Passwords are not the same",
+    },
+  },
 });
 
 const Users = mongoose.model("Users", usersSchema);
