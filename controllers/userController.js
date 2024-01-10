@@ -1,5 +1,5 @@
 const Healthcare = require("../models/healthcareModel");
-const catchAsync = require("./../utils/catchAsync");
+const Users = require("../models/usersModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -12,7 +12,7 @@ exports.getAllUsers = catchAsync(async (req, res) => {
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {
-  const user = await Model.findById(req.params.id);
+  const user = await Users.findById(req.params.id);
 
   if (!user) {
     return next(new AppError("No document with that number", 404));
