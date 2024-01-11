@@ -8,11 +8,11 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, ".files");
+    cb(null, "./dev-data/pdfUploads");
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now();
-    cb(null, uniqueSuffix + file.originalname);
+    cb(null, uniqueSuffix + "-" + file.originalname);
   },
 });
 
@@ -65,10 +65,11 @@ exports.getHealthCare = catchAsync(async (req, res, next) => {
 });
 
 // Updating create function to be able to accept files
-(exports.createHealthCare = upload.single(file)),
+exports.createHealthCare =
+  // upload.single(file),
   catchAsync(async (req, res, next) => {
     const newHealth = await Health.create(req.body);
-    const documents = req.file.documents;
+    // const documents = req.file.documents;
 
     res.status(201).json({
       status: "success",
