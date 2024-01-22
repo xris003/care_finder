@@ -55,12 +55,12 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-// healthcareSchema.methods.correctPassword = async function (
-//   candidatePassword,
-//   HealthcarePassword
-// ) {
-//   return await bcrypt.compare(candidatePassword, HealthcarePassword);
-// };
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  UserPassword
+) {
+  return await bcrypt.compare(candidatePassword, UserPassword);
+};
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
