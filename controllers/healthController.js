@@ -3,9 +3,21 @@ const Health = require("../models/healthModel");
 const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-// const healthcare = JSON.parse(
-//   fs.readFileSync(`${__dirname}/../dev-data/data/clinics.json`)
-// );
+
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./dev-data/pdfUploads");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now();
+    cb(null, uniqueSuffix + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
 exports.getAllHealthCares = catchAsync(async (req, res, next) => {
   // EXECUTE QUERY
   //   const features = new APIFeatures(Health.find(), req.query)
@@ -52,14 +64,18 @@ exports.getHealthCare = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createHealthCare = catchAsync(async (req, res, next) => {
-  const newHealth = await Health.create(req.body);
+// Updating create function to be able to accept files
+exports.createHealthCare =
+  // upload.single(file),
+  catchAsync(async (req, res, next) => {
+    const newHealth = await Health.create(req.body);
+    // const documents = req.file.documents;
 
-  res.status(201).json({
-    status: "success",
-    health: newHealth,
+    res.status(201).json({
+      status: "success",
+      health: newHealth,
+    });
   });
-});
 
 exports.updateHealthCare = catchAsync(async (req, res, next) => {
   const health = await Health.findByIdAndUpdate(req.params.id, req.body, {
