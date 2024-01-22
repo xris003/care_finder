@@ -4,13 +4,15 @@ const authUserController = require("./../controllers/authUserController");
 
 const router = express.Router();
 
+// router.param("id", (req, res, next, val) => {
+//   console.log(`HC id is: ${val}`);
+//   next();
+// });
+
 router.post("/signup", authUserController.signup);
 // router.post("/login", authController.login);
 
-router
-  .route("/")
-  .get(userController.getAllUsers)
-  .post(userController.createUser);
+router.route("/").get(userController.getAllUsers);
 
 router
   .route("/:id")
