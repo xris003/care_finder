@@ -110,30 +110,30 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 // exports.forgotPassword = catchAsync(async (req, res, next) => {
-//   // 1) Get healtcare on POSTed email
-//   const healthcare = await Healthcare.findOne({
-//     healthEmail: req.body.healthEmail,
+//   // 1) Get user on POSTed email
+//   const user = await User.findOne({
+//     userEmail: req.body.userEmail,
 //   });
-//   if (!healthcare) {
+//   if (!user) {
 //     return next(
 //       new AppError("There is no healthcare with that email address", 404)
 //     );
 //   }
 
 //   // 2) Generate random reset token
-//   const resetToken = healthcare.createPasswordResetToken();
-//   await healthcare.save({ validateBeforeSave: false });
+//   const resetToken = user.createPasswordResetToken();
+//   await user.save({ validateBeforeSave: false });
 
 //   // 3) Send to Healthcare's email
 //   const resetURL = `${req.protocol}://${req.get(
 //     "host"
-//   )}/api/v1/healthcares/resetPassword/${resetToken}`;
+//   )}/api/v1/users/resetPassword/${resetToken}`;
 
 //   const message = `Forgot your password? Submit a PATCH request with your new passsword and passwordConfirm to: ${resetURL}.\n If you didn't forget your password, please ignore this email!`;
 
 //   try {
 //     await sendEmail({
-//       email: healthcare.healthEmail,
+//       email: user.userEmail,
 //       subject: "Your password reset token (valid for 20mins)",
 //       message,
 //     });
@@ -143,9 +143,9 @@ exports.protect = catchAsync(async (req, res, next) => {
 //       message: "Token sent to email!",
 //     });
 //   } catch (err) {
-//     healthcare.passwordResetToken = undefined;
-//     healthcare.passwordResetExpires = undefined;
-//     await healthcare.save({ validateBeforeSave: false });
+//     user.passwordResetToken = undefined;
+//     user.passwordResetExpires = undefined;
+//     await user.save({ validateBeforeSave: false });
 
 //     return next(
 //       new AppError("There was an error sending the email. Try again"),
@@ -155,53 +155,47 @@ exports.protect = catchAsync(async (req, res, next) => {
 // });
 
 // exports.resetPassword = catchAsync(async (req, res, next) => {
-//   // 1) Get healthcare based on the token
+//   // 1) Get user based on the token
 //   const hashedToken = crypto
 //     .createHash("sha256")
 //     .update(req.params.token)
 //     .digest("hex");
 
-//   const healthcare = await Healthcare.findOne({
+//   const user = await User.findOne({
 //     passwordResetToken: hashedToken,
 //     passwordResetExpires: { $gt: Date.now() },
 //   });
 
-//   // 2) If token has not expired, and there is healthcare, set the new password
-//   if (!healthcare) {
+//   // 2) If token has not expired, and there is user, set the new password
+//   if (!user) {
 //     return next(new AppError("Token is invalid or has expired", 400));
 //   }
-//   healthcare.password = req.body.password;
-//   healthcare.passwordConfirm = req.body.passwordConfirm;
-//   healthcare.passwordResetToken = undefined;
-//   healthcare.passwordResetExpires = undefined;
-//   await healthcare.save();
+//   user.password = req.body.password;
+//   user.passwordConfirm = req.body.passwordConfirm;
+//   user.passwordResetToken = undefined;
+//   user.passwordResetExpires = undefined;
+//   await user.save();
 
 //   // 3) Update changedPasswordAt property for the user
 
 //   // 4) Log the healthcare in, send JWT
-//   createSendToken(healthcare, 200, res);
+//   createSendToken(user, 200, res);
 // });
 
-// exports.updatePassword = catchAsync(async (req, res, next) => {
-//   // 1) Get Healthcare from Collection
-//   const healthcare = await Healthcare.findById(req.healthcare.id).select(
-//     "+password"
-//   );
-//   // 2) Check if POSTed current password is correct
-//   if (
-//     !(await healthcare.correctPassword(
-//       req.body.passwordCurrent,
-//       healthcare.password
-//     ))
-//   ) {
-//     return next(new AppError("Your current password is wrong", 401));
-//   }
+//Enables Users update their password while being logged in
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get User from Collection
+  const user = await User.findById(req.user.id).select("+password");
+  // 2) Check if POSTed current password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Your current password is wrong", 401));
+  }
 
-//   // 3) If so update password
-//   healthcare.password = req.body.password;
-//   healthcare.passwordConfirm = req.body.passwordConfirm;
-//   await healthcare.save();
+  // 3) If so update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
 
-//   // 4) Log User in, send JWT
-//   createSendToken(healthcare, 200, res);
-// });
+  // 4) Log User in, send JWT
+  createSendToken(user, 200, res);
+});

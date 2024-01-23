@@ -11,6 +11,11 @@ router.param("id", (req, res, next, val) => {
 
 router.post("/signup", authUserController.signup);
 router.post("/login", authUserController.login);
+router.patch(
+  "/updatePassword",
+  authUserController.protect,
+  authUserController.updatePassword
+);
 
 router.route("/").get(authUserController.protect, userController.getAllUsers);
 
