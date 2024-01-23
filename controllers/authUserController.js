@@ -70,47 +70,44 @@ exports.login = catchAsync(async (req, res, next) => {
 //   res.status(200).json({ status: "success" });
 // };
 
-// exports.protect = catchAsync(async (req, res, next) => {
-//   // 1) Get the token and check if it's there
-//   let token;
-//   if (
-//     req.headers.authorization &&
-//     req.headers.authorization.startsWith("Bearer")
-//   ) {
-//     token = req.headers.authorization.split(" ")[1];
-//   }
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) Get the token and check if it's there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
-//   if (!token) {
-//     return next(
-//       new AppError("You are not logged in! Login to have access", 401)
-//     );
-//   }
-//   // 2) Verification token
-//   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-//   // console.log(decoded);
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! Login to have access", 401)
+    );
+  }
+  // 2) Verification token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  // console.log(decoded);
 
-//   // 3) Check if healthcare stil exists
-//   const currentHealthcare = await Healthcare.findById(decoded.id);
-//   if (!currentHealthcare) {
-//     return next(new AppError("The healthcare no longer exists", 401));
-//   }
+  // 3) Check if healthcare stil exists
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(new AppError("The user no longer exists", 401));
+  }
 
-//   // 4) Check if healthcare changed password after the token was isssued
-//   if (currentHealthcare.changedPasswordAfter(decoded.iat)) {
-//     return next(
-//       new AppError(
-//         "Healthcare recently changed password! Please log in again.",
-//         401
-//       )
-//     );
-//   }
+  // 4) Check if user changed password after the token was isssued
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password! Please log in again.", 401)
+    );
+  }
 
-//   // Set currentUser in both req.user and res.locals.user
-//   req.healthcare = currentHealthcare;
+  // Set currentUser in both req.user and res.locals.user
+  req.user = currentUser;
 
-//   // Grants Access to proctected route
-//   next();
-// });
+  // Grants Access to proctected route
+  next();
+});
 
 // exports.forgotPassword = catchAsync(async (req, res, next) => {
 //   // 1) Get healtcare on POSTed email

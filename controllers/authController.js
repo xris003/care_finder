@@ -111,7 +111,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Set currentUser in both req.user and res.locals.user
+  // Set currentHealthcare in both req.user and res.locals.user
   req.healthcare = currentHealthcare;
 
   // Grants Access to proctected route
