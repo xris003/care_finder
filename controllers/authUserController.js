@@ -51,7 +51,7 @@ exports.login = catchAsync(async (req, res, next) => {
     next(new AppError("Please provide email and password", 400));
   }
 
-  // 2) if Healthcare and password is correct
+  // 2) if User and password is correct
   const user = await User.findOne({ userEmail }).select("+password");
 
   if (!user || !(await user.correctPassword(password, user.password))) {
